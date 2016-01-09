@@ -1260,7 +1260,7 @@ detectshell_ver () {
 }
 detectshell () {
 	if [[ ! "${shell_type}" ]]; then
-		if [[ "${distro}" == "Cygwin" || "${distro}" == "Haiku" || "${OSTYPE}" == "gnu" ]]; then
+		if [[ "${distro}" == "Cygwin" || "${distro}" == "Haiku" || "${OSTYPE}" == "gnu" || "${distro}" == "Solaris" ]]; then
 			shell_type=$(echo "$SHELL" | awk -F'/' '{print $NF}')
 		else
 			if [[ "${OSTYPE}" == "linux-gnu" || "${OSTYPE}" == "linux" ]]; then
