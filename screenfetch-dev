@@ -545,6 +545,10 @@ detectdistro () {
 						distro="Haiku"
 						distro_more="$(uname -v | tr ' ' '\n' | grep 'hrev')"
 					;;
+					"Solaris")
+						distro="Solaris"
+						distro_more="$(uname -v)"
+					;;
 					"GNU/Linux")
 						if type -p crux >/dev/null 2>&1; then
 							distro="CRUX"
@@ -752,7 +756,7 @@ detectdistro () {
 		distro_more="${distro} ${distro_more}"
 	fi
 
-	if [[ "${distro}" != "Haiku" ]]; then
+	if [[ "${distro}" != "Haiku" && "${distro}" != "Solaris" ]]; then
 		if [[ ${BASH_VERSINFO[0]} -ge 4 ]]; then
 			if [[ ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -gt 1 ]] || [[ ${BASH_VERSINFO[0]} -gt 4 ]]; then
 				distro=${distro,,}
@@ -764,7 +768,7 @@ detectdistro () {
 		fi
 	fi
 
-	if [[ -n ${distro_more} ]]; then
+	if [[ -n ${distro_more} && "${distro}" != "Solaris" ]]; then
 		distro_more="${distro} ${distro_more}"
 	fi
 
@@ -865,6 +869,8 @@ detectuptime () {
 		uptime=$((${now} - ${boot}))
 	elif [[ "${distro}" == "Haiku" ]]; then
 		uptime=$(uptime | cut -d ',' -f2,3 | sed 's/ up //; s/ hour,/h/; s/ minutes/m/;')
+	elif [[ "${distro}" == "Solaris" ]]; then
+		uptime=$(kstat -p unix:0:system_misc:snaptime | awk '{print $2}' | cut -d "." -f1)
 	else
 		if [[ -f /proc/uptime ]]; then
 			uptime=$(</proc/uptime)
