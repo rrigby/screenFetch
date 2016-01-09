@@ -967,6 +967,9 @@ detectpkgs () {
 				pkgs=$(installoptionalpackage -l | sed -n '3p' | wc -w)
 			fi
 		;;
+		'Solaris')
+			pkgs=$(pkginfo | wc -l)
+		;;
 	esac
 	verboseOut "Finding current package count...found as '$pkgs'"
 }
@@ -1011,6 +1014,8 @@ detectcpu () {
 				cpu="$cpu @ ${cpu_mhz}MHz"
 			fi
 		fi
+	elif [ "$distro" == "Solaris" ]; then
+		cpu=$(psrinfo -vp | tail -n1 | sed 's/(tm)//; s/(r)//; s/Processor//;')
 	else
 		cpu=$(awk 'BEGIN{FS=":"} /model name/ { print $2; exit }' /proc/cpuinfo | awk 'BEGIN{FS=" @"; OFS="\n"} { print $1; exit }')
 		cpun=$(grep "physical id" /proc/cpuinfo | sort | uniq | wc -l)
