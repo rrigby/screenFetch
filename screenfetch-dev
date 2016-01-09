@@ -1122,7 +1122,7 @@ detectdisk () {
 	if type -p df >/dev/null 2>&1; then
 		if [[ "${distro}" =~ (Free|Net|Open|DragonFly)BSD ]]; then
 			totaldisk=$(df -h -c 2>/dev/null | tail -1)
-		elif [[ "${distro}" == "Mac OS X" ]]; then
+		elif [[ "${distro}" == "Mac OS X" || "${distro}" == "Solaris" ]]; then
 			totaldisk=$(df -H / 2>/dev/null | tail -1)
 		else
 			totaldisk=$(df -h --total 2>/dev/null | tail -1)
@@ -1193,6 +1193,11 @@ detectmem () {
 	elif [ "$distro" == "Haiku" ]; then
 		totalmem=$(( $(sysinfo -mem | head -n1 | cut -d'/' -f3 | tr -d ' ' | tr -d ')') / $human / $human ))
 		usedmem=$(( $(sysinfo -mem | head -n1 | cut -d'/' -f2 | sed 's/max//; s/ //g') / $human / $human ))
+	elif [ "$distro" == "Solaris" ]; then
+		pagesize=$(($(pagesize) / $human))
+		totalmem=$(prtconf | grep Memory | awk '{print $3}')
+		freemem=$(($(kstat -p unix:0:system_pages:pagesfree | awk '{print $2}') * $pagesize))
+		usedmem=$(($totalmem - ($freemem / $human)))
 	else
 		mem_info=$(</proc/meminfo)
 		mem_info=$(echo $(echo $(mem_info=${mem_info// /}; echo ${mem_info//kB/})))
